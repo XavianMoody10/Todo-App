@@ -152,6 +152,8 @@ const createItem = () => {
     };
 
     ResetEverything();
+
+    // NEED TO ADD LOACL STORAGE!!!!!!!!!
   }
 };
 
@@ -159,3 +161,6 @@ changeDisplays();
 titleInputValidation();
 createItem();
 getItemTags();
+
+function localStorage() {}
+// localStorage.clear();
