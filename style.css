@@ -1,0 +1,278 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#todo {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-item {
+  border: 1px solid rgba(0, 0, 0, 0.214);
+}
+
+#todo-grid {
+  width: 70%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+}
+
+#create-container {
+  grid-column: 1/7;
+}
+
+#filter-container {
+  grid-column: 7/13;
+}
+
+#new-container {
+  grid-column: 1/5;
+}
+
+#active-container {
+  grid-column: 5/9;
+}
+
+#completed-container {
+  grid-column: 9/13;
+}
+
+/* START AND CREATE DISPLAYS */
+.hidden {
+  display: none;
+}
+
+.start-display,
+.create-display {
+  height: 300px;
+  margin: 10px;
+}
+
+/* start display*/
+.start-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-display h1 {
+  font-size: 3rem;
+  margin: 30px;
+}
+
+.start-display button {
+  border: 2px solid rgba(0, 0, 0, 0.162);
+  color: rgba(0, 0, 0, 0.162);
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: white;
+  padding: 10px 30px;
+  transition-duration: 0.5s;
+}
+
+.start-display button:hover {
+  border-color: black;
+  color: black;
+}
+
+/* create display */
+.create-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-display h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.create-display .flex-container {
+  display: flex;
+}
+
+.columns {
+  padding: 5px;
+}
+
+/* Column 1 */
+#column-1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#title-input,
+#details-input {
+  width: 100%;
+  padding: 5px;
+}
+
+#details-input {
+  resize: none;
+}
+
+#title-error {
+  font-size: 0.8rem;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  opacity: 0;
+}
+
+/* Column 2 */
+#column-2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#column-2 h4 {
+  font-size: 0.8rem;
+  margin: 10px 0;
+}
+
+#tags-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.tags {
+  border: none;
+  padding: 3px 15px;
+  font-weight: bold;
+}
+
+.tags:first-child {
+  background-color: rgb(60, 235, 60);
+}
+.tags:nth-child(2) {
+  background-color: rgb(60, 188, 235);
+}
+.tags:nth-child(3) {
+  background-color: rgb(254, 74, 236);
+}
+.tags:nth-child(4) {
+  background-color: rgb(225, 253, 67);
+}
+.tags:nth-child(5) {
+  background-color: rgb(240, 155, 35);
+}
+.tags:nth-child(6) {
+  background-color: rgb(249, 36, 64);
+}
+.tags:nth-child(7) {
+  background-color: rgb(255, 133, 235);
+}
+.tags:nth-child(8) {
+  background-color: rgb(0, 0, 0);
+  color: white;
+}
+
+#btns {
+  margin-top: auto;
+}
+
+#btns button {
+  border: none;
+  padding: 7px 15px;
+  font-weight: bold;
+}
+
+#btns button:first-child {
+  background-color: rgb(22, 244, 22);
+}
+
+#btns button:last-child {
+  background-color: rgb(244, 22, 22);
+}
+
+/* Filter Container */
+#filter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+#search {
+  border-bottom: 1px solid black;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#search-input {
+  border: none;
+  outline: none;
+  padding: 5px;
+  width: 130px;
+}
+
+#results-container {
+  border: 1px solid rgba(0, 0, 0, 0.214);
+  height: 100%;
+  width: 100%;
+}
+
+#new-container,
+#active-container,
+#completed-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dropzones-title {
+  margin-bottom: 10px;
+}
+
+.dropzones {
+  border: 1px solid rgba(0, 0, 0, 0.214);
+  height: 300px;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* -------------------------------------------------------- */
+/* Items */
+.item {
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 5px 2px;
+}
+
+.item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.item-tags li {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 0 3px;
+  list-style: none;
+  font-size: 0.6rem;
+  font-weight: bold;
+  margin: 2px 3px;
+}
+
+.item-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 0px 2px;
+}

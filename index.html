@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/16b96c8656.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="style.css" />
+    <title>Todo Application</title>
+  </head>
+  <body>
+    <section id="todo">
+      <div id="todo-grid">
+        <div id="create-container" class="grid-item">
+          <!-- class="start-display" -->
+          <div id="start" class="hidden">
+            <h1>Create An Item</h1>
+            <button>Create</button>
+          </div>
+
+          <!-- class="create-display" -->
+          <div id="create" class="create-display">
+            <h3>Create A Item</h3>
+
+            <div class="flex-container">
+              <div id="column-1" class="columns">
+                <div id="get-title">
+                  <input
+                    id="title-input"
+                    type="text"
+                    placeholder="Enter a title"
+                  />
+
+                  <p id="title-error">This is an error</p>
+                </div>
+
+                <textarea
+                  name="details"
+                  id="details-input"
+                  placeholder="More Details"
+                  cols="30"
+                  rows="9"
+                ></textarea>
+              </div>
+
+              <div id="column-2" class="columns">
+                <h4>Choose Tags</h4>
+
+                <div id="tags-grid">
+                  <button class="tags">Tag 1</button>
+                  <button class="tags">Tag 2</button>
+                  <button class="tags">Tag 3</button>
+                  <button class="tags">Tag 4</button>
+                  <button class="tags">Tag 5</button>
+                  <button class="tags">Tag 6</button>
+                  <button class="tags">Tag 7</button>
+                  <button class="tags">Tag 8</button>
+                </div>
+
+                <div id="btns">
+                  <button>CREATE</button>
+                  <button>CANCEL</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter container -->
+        <div id="filter-container" class="grid-item">
+          <div id="search">
+            <input id="search-input" type="text" placeholder="Search" />
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+
+          <div id="results-container"></div>
+        </div>
+
+        <!-- New container -->
+        <div id="new-container" class="grid-item">
+          <h3 class="dropzones-title">New Items</h3>
+          <div class="dropzones">
+            <!-- Item -->
+            <!-- <div class="item">
+              <ul class="item-tags">
+                <li>Tag 1</li>
+                <li>Tag 2</li>
+                <li>Tag 3</li>
+                <li>Tag 5</li>
+                <li>Tag 6</li>
+                <li>Tag 7</li>
+                <li>Tag 8</li>
+              </ul>
+              <p class="item-title">This is a title</p>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Active container -->
+        <div id="active-container" class="grid-item">
+          <h3 class="dropzones-title">Active Items</h3>
+          <div class="dropzones"></div>
+        </div>
+
+        <!-- Completed container -->
+        <div id="completed-container" class="grid-item">
+          <h3 class="dropzones-title">Completed Items</h3>
+          <div class="dropzones"></div>
+        </div>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>
