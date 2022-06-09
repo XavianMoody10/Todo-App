@@ -1,6 +1,8 @@
 "use strict";
 const tagsArray = new Set();
 const elementData = [];
+const storageArray = [];
+localStorage.setItem("allItems", JSON.stringify(storageArray));
 
 // Allow the user to toggle between the start and create displays in the create container.
 const changeDisplays = () => {
@@ -52,6 +54,7 @@ const titleInputValidation = () => {
   titleInput.addEventListener("input", checkTitle);
 };
 
+// Get title from title input
 const getItemTitle = () => {
   const titleInput = document.querySelector("#title-input");
   const title = titleInput.value;
@@ -59,6 +62,7 @@ const getItemTitle = () => {
   return title;
 };
 
+// Get details from detail input
 const getItemDetails = () => {
   const detailsInput = document.querySelector("#details-input");
   const details = detailsInput.value;
@@ -85,6 +89,7 @@ const getItemTags = () => {
   return tagsArray;
 };
 
+// Store list items info into an object;
 const createItem = () => {
   const createBtn = document.querySelector("#btns button:first-child");
   const titleError = document.querySelector("#title-error");
@@ -106,6 +111,7 @@ const createItem = () => {
     }
   });
 
+  // Add new list Item into the DOM
   function createItemElement(data) {
     const dropzone = document.querySelector("#new-container .dropzones");
 
@@ -116,6 +122,7 @@ const createItem = () => {
 
     // Add the classes to the elements
     newItem.classList.add("item");
+    newItem.draggable = true;
     newUl.classList.add("item-tags");
     newPara.classList.add("item-title");
 
@@ -151,16 +158,66 @@ const createItem = () => {
       detailsInput.value = "";
     };
 
-    ResetEverything();
+    // Local Storage
+    const browserStorage = () => {
+      // Get the old data and parse into an regular array
+      const oldData = JSON.parse(localStorage.getItem("allItems"));
 
-    // NEED TO ADD LOACL STORAGE!!!!!!!!!
+      // Push new data into old data array (it updates the array with the new data)
+      oldData.push([JSON.stringify(data), JSON.stringify(newItem.outerHTML)]);
+
+      // set the array into local storage and stringify
+      localStorage.setItem("allItems", JSON.stringify(oldData));
+    };
+
+    ResetEverything();
+    browserStorage();
   }
+};
+
+const dragndrop = () => {
+  const draggables = document.querySelectorAll(".item");
+  const dropzones = document.querySelectorAll(".dropzones");
+  const nondraggables = document.querySelectorAll(".item:not(.draggable)");
+
+  [...draggables].forEach((draggable) => {
+    draggable.addEventListener("dragstart", () => {
+      draggable.classList.add("draggable");
+    });
+
+    draggable.addEventListener("dragend", () => {
+      draggable.classList.remove("draggable");
+    });
+  });
+
+  nondraggables.forEach((nondraggable) => {
+    nondraggable.addEventListener("dragover", (e) => {
+      const dropzone = e.target.closest(".dropzones");
+
+      if (e.target.closest(".item:not(.draggable)")) {
+        dropzone.insertBefore(e.target, document.querySelector(".draggable"));
+      }
+
+      console.log(dropzone);
+      console.log("DRAGOVER", e.target);
+    });
+  });
+
+  [...dropzones].forEach((dropzone) => {
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    dropzone.addEventListener("drop", () => {
+      const draggable = document.querySelector(".draggable");
+
+      // dropzone.appendChild(draggable);
+    });
+  });
 };
 
 changeDisplays();
 titleInputValidation();
 createItem();
 getItemTags();
-
-function localStorage() {}
-// localStorage.clear();
+dragndrop();

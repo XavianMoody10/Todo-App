@@ -276,3 +276,11 @@
   font-weight: bold;
   padding: 0px 2px;
 }
+
+.draggable {
+  opacity: 0.2;
+}
+
+.dragenter {
+  background-color: gray;
+}
