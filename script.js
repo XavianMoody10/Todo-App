@@ -190,16 +190,24 @@ const dragndrop = () => {
     });
   });
 
-  nondraggables.forEach((nondraggable) => {
-    nondraggable.addEventListener("dragover", (e) => {
-      const dropzone = e.target.closest(".dropzones");
+  [...nondraggables].forEach((nonEl) => {
+    nonEl.addEventListener("dragover", (e) => {
+      const dragEl = document.querySelector(".draggable");
+      const dropzone = dragEl.closest(".dropzones");
+      const nextChild = e.target.closest(".item");
 
-      if (e.target.closest(".item:not(.draggable)")) {
-        dropzone.insertBefore(e.target, document.querySelector(".draggable"));
+      if (nextChild.previousElementSibling == null) {
+        return;
+      } else {
+        dropzone.insertBefore(nextChild, dragEl);
       }
 
+      e.stopPropagation();
+      e.preventDefault();
+
+      console.log(dragEl);
       console.log(dropzone);
-      console.log("DRAGOVER", e.target);
+      console.log(nextChild);
     });
   });
 
@@ -209,8 +217,7 @@ const dragndrop = () => {
     });
 
     dropzone.addEventListener("drop", () => {
-      const draggable = document.querySelector(".draggable");
-
+      // const draggable = document.querySelector(".draggable");
       // dropzone.appendChild(draggable);
     });
   });
