@@ -190,35 +190,32 @@ const dragndrop = () => {
     });
   });
 
-  [...nondraggables].forEach((nonEl) => {
-    nonEl.addEventListener("dragover", (e) => {
-      const dragEl = document.querySelector(".draggable");
-      const dropzone = dragEl.closest(".dropzones");
-      const nextChild = e.target.closest(".item");
-
-      if (nextChild.previousElementSibling == null) {
-        return;
-      } else {
-        dropzone.insertBefore(nextChild, dragEl);
-      }
-
-      e.stopPropagation();
-      e.preventDefault();
-
-      console.log(dragEl);
-      console.log(dropzone);
-      console.log(nextChild);
-    });
-  });
-
   [...dropzones].forEach((dropzone) => {
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
     });
+  });
 
-    dropzone.addEventListener("drop", () => {
-      // const draggable = document.querySelector(".draggable");
-      // dropzone.appendChild(draggable);
+  document.querySelectorAll("*").forEach((el) => {
+    el.addEventListener("dragover", (e) => {
+      const draggable = document.querySelector(".draggable");
+      const dragoverEl = e.target;
+
+      if (dragoverEl.classList.contains("dropzones")) {
+        console.log("DROPZONE");
+        dragoverEl.appendChild(draggable);
+        console.log(dragoverEl);
+      }
+
+      if (
+        dragoverEl.classList.contains("item") &&
+        !dragoverEl.classList.contains("draggable")
+      ) {
+        console.log("ITEM");
+        const dropzone = draggable.closest(".dropzones");
+
+        dropzone.insertBefore(draggable, dragoverEl);
+      }
     });
   });
 };
