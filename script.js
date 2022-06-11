@@ -1,8 +1,7 @@
 "use strict";
 const elementData = [];
-const storageArray = [];
 const tagsArray = new Set();
-localStorage.setItem("allItems", JSON.stringify(storageArray));
+const elementInfoData = [];
 
 // Allow the user to toggle between the start and create displays in the create container.
 const changeDisplays = () => {
@@ -172,24 +171,14 @@ const createItem = () => {
       titleError.style.opacity = 0;
     };
 
-    // Local Storage
-    const elementInfoStorage = () => {
-      // Get the old data and parse into an regular array
-      const oldData = JSON.parse(localStorage.getItem("allItems"));
-
-      // Push new data into old data array (it updates the array with the new data)
-      oldData.push([JSON.stringify(data), JSON.stringify(newItem.outerHTML)]);
-
-      // set the array into local storage and stringify
-      localStorage.setItem("allItems", JSON.stringify(oldData));
-    };
-
+    elementInfoStorage(data);
     ResetEverything();
-    elementInfoStorage();
   }
 };
 
-// Drag and drop functionality
+// ------------------------------------------------------------------------
+
+// DRAGN AND DROP FUNCTIONALITY (WITH SORTING)
 const dragndrop = () => {
   const dropzones = document.querySelectorAll(".dropzones");
 
@@ -223,7 +212,7 @@ const dragndrop = () => {
     });
   });
 
-  // This is the sorting functionlity
+  // SORTING FUNCTIONALITY
   document.querySelectorAll("*").forEach((el) => {
     el.addEventListener("dragover", (e) => {
       const draggable = document.querySelector(".draggable");
@@ -246,7 +235,34 @@ const dragndrop = () => {
   });
 };
 
-// Dropzones children localStorage
+// ---------------------------------------------------------------------------
+
+// ELEMENT INFO LOCALSTORAGE
+const elementInfoStorage = (itemdata) => {
+  elementInfoData.push(itemdata);
+  localStorage.setItem("Items Data", JSON.stringify(elementInfoData));
+};
+
+// ----------------------------------------------------------------------
+
+// THE FUNCTIONS EXECUTES WHEN THE PAGE LOADS
+
+// LOADING ELEMENT INFO LOCALSTORAGE
+const loadingElementInfoData = () => {
+  const getLocalElements = JSON.parse(localStorage.getItem("Items Data"));
+
+  if (getLocalElements == null) {
+    console.log("NO ITEMS STORED IN LOCALSTORAGE");
+  } else {
+    [...getLocalElements].forEach((el) => {
+      elementInfoData.push(el);
+    });
+
+    console.log(elementInfoData);
+  }
+};
+
+// DROPZONES LOCAL STORAGE
 function DropzonesElementStorage(
   newChildren,
   activeChildren,
@@ -312,10 +328,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// localStorage.clear();
-
 changeDisplays();
 titleInputValidation();
 createItem();
 getItemTags();
 dragndrop();
+loadingElementInfoData();
