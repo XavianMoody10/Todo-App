@@ -1,7 +1,7 @@
 "use strict";
-const tagsArray = new Set();
 const elementData = [];
 const storageArray = [];
+const tagsArray = new Set();
 localStorage.setItem("allItems", JSON.stringify(storageArray));
 
 // Allow the user to toggle between the start and create displays in the create container.
@@ -70,7 +70,7 @@ const getItemDetails = () => {
   return details;
 };
 
-// Get tags will go here
+// Selecting tags for items
 const getItemTags = () => {
   const tags = document.querySelectorAll(".tags");
 
@@ -78,11 +78,11 @@ const getItemTags = () => {
     tag.addEventListener("click", () => {
       if (tagsArray.has(tag.textContent)) {
         tagsArray.delete(tag.textContent);
+        tag.classList.toggle("selected");
       } else {
         tagsArray.add(tag.textContent);
+        tag.classList.toggle("selected");
       }
-
-      console.log(tagsArray);
     });
   });
 
@@ -93,6 +93,8 @@ const getItemTags = () => {
 const createItem = () => {
   const createBtn = document.querySelector("#btns button:first-child");
   const titleError = document.querySelector("#title-error");
+  const tagSelection = document.querySelectorAll(".tags");
+  const dropzones = document.querySelectorAll(".dropzones");
 
   createBtn.addEventListener("click", () => {
     const itemInfo = {
@@ -109,11 +111,18 @@ const createItem = () => {
       titleError.textContent = "Please enter a title before proceeding";
       titleError.style.color = "red";
     }
+
+    DropzonesElementStorage(
+      dropzones[0].children,
+      dropzones[1].children,
+      dropzones[2].children
+    );
   });
 
   // Add new list Item into the DOM
   function createItemElement(data) {
     const dropzone = document.querySelector("#new-container .dropzones");
+    const titleError = document.querySelector("#title-error");
 
     // Create new elements
     const newItem = document.createElement("div");
@@ -143,7 +152,6 @@ const createItem = () => {
 
     // Append to array to save data
     elementData.push([data, newItem]);
-    console.log(elementData);
 
     // Reset all inputs and selected tags
     const ResetEverything = () => {
@@ -152,14 +160,20 @@ const createItem = () => {
 
       // Reset tags Set
       tagsArray.clear();
+      tagSelection.forEach((tag) => {
+        tag.classList.remove("selected");
+      });
 
       // Reset all inputs
       titleInput.value = "";
       detailsInput.value = "";
+
+      // DEFAULT error
+      titleError.style.opacity = 0;
     };
 
     // Local Storage
-    const browserStorage = () => {
+    const elementInfoStorage = () => {
       // Get the old data and parse into an regular array
       const oldData = JSON.parse(localStorage.getItem("allItems"));
 
@@ -171,54 +185,134 @@ const createItem = () => {
     };
 
     ResetEverything();
-    browserStorage();
+    elementInfoStorage();
   }
 };
 
+// Drag and drop functionality
 const dragndrop = () => {
-  const draggables = document.querySelectorAll(".item");
   const dropzones = document.querySelectorAll(".dropzones");
-  const nondraggables = document.querySelectorAll(".item:not(.draggable)");
 
-  [...draggables].forEach((draggable) => {
-    draggable.addEventListener("dragstart", () => {
-      draggable.classList.add("draggable");
-    });
+  document.addEventListener("dragstart", (e) => {
+    if (e.target.closest(".item")) {
+      e.target.classList.add("draggable");
+    }
+  });
 
-    draggable.addEventListener("dragend", () => {
-      draggable.classList.remove("draggable");
-    });
+  document.addEventListener("dragend", (e) => {
+    if (e.target.closest(".item")) {
+      e.target.classList.remove("draggable");
+    }
   });
 
   [...dropzones].forEach((dropzone) => {
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
     });
+
+    // Pass values to localstorage
+    dropzone.addEventListener("drop", () => {
+      // I used setTimeout because when I dropped a list item into a dropzone, the item would save in the localstorage, but the "draggable" class would not remove before being added. Adding setTimeout allows the item to be saved in local storage after the draggable event is removed.
+      setTimeout(() => {
+        DropzonesElementStorage(
+          dropzones[0].children,
+          dropzones[1].children,
+          dropzones[2].children
+        );
+      }, 100);
+    });
   });
 
+  // This is the sorting functionlity
   document.querySelectorAll("*").forEach((el) => {
     el.addEventListener("dragover", (e) => {
       const draggable = document.querySelector(".draggable");
       const dragoverEl = e.target;
 
+      // Append item to dropzone at the end
       if (dragoverEl.classList.contains("dropzones")) {
-        console.log("DROPZONE");
         dragoverEl.appendChild(draggable);
-        console.log(dragoverEl);
       }
 
+      // When draggable item hovers over another a undraggable item, append the draggable item after the undraggable
       if (
         dragoverEl.classList.contains("item") &&
         !dragoverEl.classList.contains("draggable")
       ) {
-        console.log("ITEM");
         const dropzone = draggable.closest(".dropzones");
-
         dropzone.insertBefore(draggable, dragoverEl);
       }
     });
   });
 };
+
+// Dropzones children localStorage
+function DropzonesElementStorage(
+  newChildren,
+  activeChildren,
+  completeChildren
+) {
+  const newArray = [];
+  const activeArray = [];
+  const completeArray = [];
+
+  [...newChildren].forEach((child) => {
+    newArray.push(child.outerHTML);
+  });
+
+  [...activeChildren].forEach((child) => {
+    activeArray.push(child.outerHTML);
+  });
+
+  [...completeChildren].forEach((child) => {
+    completeArray.push(child.outerHTML);
+  });
+
+  localStorage.removeItem("newitems");
+  localStorage.removeItem("activeitems");
+  localStorage.removeItem("completeitems");
+
+  localStorage.setItem("newitems", JSON.stringify(newArray));
+  localStorage.setItem("activeitems", JSON.stringify(activeArray));
+  localStorage.setItem("completeitems", JSON.stringify(completeArray));
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const dropzones = document.querySelectorAll(".dropzones");
+  const getNewItems = JSON.parse(localStorage.getItem("newitems"));
+  const getActiveItems = JSON.parse(localStorage.getItem("activeitems"));
+  const getCompleteItems = JSON.parse(localStorage.getItem("completeitems"));
+
+  // If locally stored array is null, then return. Else, append array element
+  if (getNewItems == null) {
+    return;
+  } else {
+    [...getNewItems].forEach((child) => {
+      const childEl = child;
+      dropzones[0].insertAdjacentHTML("beforeend", childEl);
+    });
+  }
+
+  if (getActiveItems == null) {
+    return;
+  } else {
+    [...getActiveItems].forEach((child) => {
+      const childEl = child;
+      dropzones[1].insertAdjacentHTML("beforeend", childEl);
+    });
+  }
+
+  if (getCompleteItems == null) {
+    return;
+  } else {
+    [...getCompleteItems].forEach((child) => {
+      const childEl = child;
+      dropzones[2].insertAdjacentHTML("beforeend", childEl);
+    });
+  }
+});
+
+// localStorage.clear();
 
 changeDisplays();
 titleInputValidation();
