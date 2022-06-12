@@ -1,7 +1,8 @@
 "use strict";
-const elementData = [];
+const allElementsData = [];
 const tagsArray = new Set();
 const elementInfoData = [];
+let itemCounter = 0;
 
 // Allow the user to toggle between the start and create displays in the create container.
 const changeDisplays = () => {
@@ -150,7 +151,7 @@ const createItem = () => {
     dropzone.append(newItem);
 
     // Append to array to save data
-    elementData.push([data, newItem]);
+    allElementsData.push([data, newItem]);
 
     // Reset all inputs and selected tags
     const ResetEverything = () => {
@@ -217,6 +218,7 @@ const dragndrop = () => {
     el.addEventListener("dragover", (e) => {
       const draggable = document.querySelector(".draggable");
       const dragoverEl = e.target;
+      const closestDropzone = draggable.cloneNode(".dropzones");
 
       // Append item to dropzone at the end
       if (dragoverEl.classList.contains("dropzones")) {
@@ -231,6 +233,11 @@ const dragndrop = () => {
         const dropzone = draggable.closest(".dropzones");
         dropzone.insertBefore(draggable, dragoverEl);
       }
+
+      // When dragging over th first child in the dropzone, insert draggable before the first child
+      closestDropzone.firstChild.addEventListener("dragover", () => {
+        closestDropzone.insertBefore(draggable, dragoverEl);
+      });
     });
   });
 };
@@ -245,8 +252,89 @@ const elementInfoStorage = (itemdata) => {
 
 // ----------------------------------------------------------------------
 
-// THE FUNCTIONS EXECUTES WHEN THE PAGE LOADS
+const searchItems = () => {
+  const searchInput = document.querySelector("#search-input");
+  const resultContainer = document.querySelector("#results-container");
+  const resultsArray = [];
 
+  searchInput.addEventListener("input", (e) => {
+    const getData = JSON.parse(localStorage.getItem("Items Data"));
+
+    const resetResults = () => {
+      [...resultsArray].forEach((data) => {
+        resultsArray.pop(data);
+      });
+
+      [...resultContainer.children].forEach((child) => {
+        resultContainer.removeChild(child);
+      });
+    };
+
+    const test = new Promise((respond, reject) => {
+      if (e.target.value == "") {
+        reject("FAILED");
+      } else {
+        respond("PASSED");
+      }
+    });
+
+    test
+      .then((message) => {
+        resetResults();
+
+        [...getData].forEach((data) => {
+          if (
+            data.title.includes(e.target.value) ||
+            data.details.includes(e.target.value)
+          ) {
+            resultsArray.push(data);
+          }
+        });
+
+        console.log(resultsArray);
+        console.log(message);
+      })
+      .then(() => {
+        [...resultsArray].forEach((result) => {
+          // Create Elements
+          const newItem = document.createElement("div");
+          const newUl = document.createElement("ul");
+          const newPara = document.createElement("p");
+
+          // Add the classes to the elements
+          newItem.classList.add("item");
+          newUl.classList.add("item-tags");
+          newPara.classList.add("item-title");
+
+          // Create elements for tags and append to the unorder list element
+          result.tags.forEach((tag) => {
+            const newLI = document.createElement("li");
+            newLI.textContent = tag;
+            newUl.appendChild(newLI);
+          });
+
+          // Add title text to newPara element
+          newPara.textContent = result.title;
+
+          // Append items orderly
+          newItem.append(newUl);
+          newItem.append(newPara);
+          resultContainer.appendChild(newItem);
+        });
+      })
+      .catch((message) => {
+        resetResults();
+        console.log(resultsArray);
+        console.log(message);
+      });
+  });
+};
+
+searchItems();
+
+// -----------------------------------------------------------------------
+
+// THE FUNCTIONS EXECUTES WHEN THE PAGE LOADS
 // LOADING ELEMENT INFO LOCALSTORAGE
 const loadingElementInfoData = () => {
   const getLocalElements = JSON.parse(localStorage.getItem("Items Data"));
@@ -257,8 +345,6 @@ const loadingElementInfoData = () => {
     [...getLocalElements].forEach((el) => {
       elementInfoData.push(el);
     });
-
-    console.log(elementInfoData);
   }
 };
 
