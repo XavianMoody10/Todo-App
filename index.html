@@ -76,7 +76,20 @@
             <i class="fa-solid fa-magnifying-glass"></i>
           </div>
 
-          <div id="results-container"></div>
+          <div id="results-container">
+            <!-- class="loading" -->
+            <div id="loading" class="hidden">
+              <div id="outer-circle">
+                <div id="inner-circle"></div>
+                <div id="line"></div>
+              </div>
+            </div>
+
+            <!-- class="failed" -->
+            <div id="failed" class="hidden">
+              <p>NO RESULTS</p>
+            </div>
+          </div>
         </div>
 
         <!-- New container -->
@@ -94,6 +107,7 @@
                 <li>Tag 8</li>
               </ul>
               <p class="item-title">This is a title 1</p>
+              <i class="fa-solid fa-trash delete-icon"></i>
             </div> -->
           </div>
         </div>

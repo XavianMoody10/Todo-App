@@ -128,6 +128,7 @@ const createItem = () => {
     const newItem = document.createElement("div");
     const newUl = document.createElement("ul");
     const newPara = document.createElement("p");
+    const trashIcon = `<i class="fa-solid fa-trash delete-icon"></i>`;
 
     // Add the classes to the elements
     newItem.classList.add("item");
@@ -148,6 +149,7 @@ const createItem = () => {
     // Appen items orderly
     newItem.append(newUl);
     newItem.append(newPara);
+    newItem.insertAdjacentHTML("beforeend", trashIcon);
     dropzone.append(newItem);
 
     // Append to array to save data
@@ -252,80 +254,122 @@ const elementInfoStorage = (itemdata) => {
 
 // ----------------------------------------------------------------------
 
+// SEARCHING Items
 const searchItems = () => {
   const searchInput = document.querySelector("#search-input");
   const resultContainer = document.querySelector("#results-container");
+  const loading = document.querySelector("#loading");
+  const noResults = document.querySelector("#failed");
   const resultsArray = [];
 
   searchInput.addEventListener("input", (e) => {
     const getData = JSON.parse(localStorage.getItem("Items Data"));
 
-    const resetResults = () => {
+    const addLoadingScreen = () => {
+      loading.classList.add("loading");
+      loading.classList.remove("hidden");
+    };
+
+    const removeLoadingScreen = () => {
+      loading.classList.add("hidden");
+      loading.classList.remove("loading");
+    };
+
+    const addNoResults = () => {
+      noResults.classList.replace("hidden", "failed");
+    };
+
+    const removeNoResults = () => {
+      noResults.classList.replace("failed", "hidden");
+    };
+
+    const resetContainerChildren = () => {
+      [...resultContainer.children].forEach((child) => {
+        if (child.classList.contains("item")) {
+          resultContainer.removeChild(child);
+        }
+      });
+    };
+
+    const resetResult = () => {
       [...resultsArray].forEach((data) => {
         resultsArray.pop(data);
       });
 
-      [...resultContainer.children].forEach((child) => {
-        resultContainer.removeChild(child);
-      });
+      resetContainerChildren();
     };
 
+    removeNoResults();
+    addLoadingScreen();
+    resetResult();
+
     const test = new Promise((respond, reject) => {
-      if (e.target.value == "") {
-        reject("FAILED");
+      resetResult();
+
+      [...getData].forEach((data) => {
+        if (
+          data.title.includes(e.target.value) ||
+          data.details.includes(e.target.value)
+        ) {
+          resultsArray.push(data);
+        }
+      });
+
+      if (e.target.value == "" || resultsArray.length == 0) {
+        console.log(resultsArray);
+        reject();
       } else {
-        respond("PASSED");
+        console.log(resultsArray);
+        respond();
       }
     });
 
     test
-      .then((message) => {
-        resetResults();
-
-        [...getData].forEach((data) => {
-          if (
-            data.title.includes(e.target.value) ||
-            data.details.includes(e.target.value)
-          ) {
-            resultsArray.push(data);
-          }
-        });
-
-        console.log(resultsArray);
-        console.log(message);
-      })
       .then(() => {
-        [...resultsArray].forEach((result) => {
-          // Create Elements
-          const newItem = document.createElement("div");
-          const newUl = document.createElement("ul");
-          const newPara = document.createElement("p");
+        removeNoResults();
 
-          // Add the classes to the elements
-          newItem.classList.add("item");
-          newUl.classList.add("item-tags");
-          newPara.classList.add("item-title");
+        setTimeout(() => {
+          resetContainerChildren();
+          removeLoadingScreen();
 
-          // Create elements for tags and append to the unorder list element
-          result.tags.forEach((tag) => {
-            const newLI = document.createElement("li");
-            newLI.textContent = tag;
-            newUl.appendChild(newLI);
+          [...resultsArray].forEach((result) => {
+            // Create Elements
+            const newItem = document.createElement("div");
+            const newUl = document.createElement("ul");
+            const newPara = document.createElement("p");
+            const trashIcon = `<i class="fa-solid fa-trash delete-icon"></i>`;
+
+            // Add the classes to the elements
+            newItem.classList.add("item");
+            newUl.classList.add("item-tags");
+            newPara.classList.add("item-title");
+
+            // Create elements for tags and append to the unorder list element
+            result.tags.forEach((tag) => {
+              const newLI = document.createElement("li");
+              newLI.textContent = tag;
+              newUl.appendChild(newLI);
+            });
+
+            // Add title text to newPara element
+            newPara.textContent = result.title;
+
+            // Append items orderly
+            newItem.append(newUl);
+            newItem.append(newPara);
+            newItem.insertAdjacentHTML("beforeend", trashIcon);
+
+            resultContainer.appendChild(newItem);
           });
-
-          // Add title text to newPara element
-          newPara.textContent = result.title;
-
-          // Append items orderly
-          newItem.append(newUl);
-          newItem.append(newPara);
-          resultContainer.appendChild(newItem);
-        });
+        }, 500);
       })
-      .catch((message) => {
-        resetResults();
-        console.log(resultsArray);
-        console.log(message);
+      .catch(() => {
+        resetResult();
+
+        setTimeout(() => {
+          addNoResults();
+          removeLoadingScreen();
+        }, 300);
       });
   });
 };
@@ -414,9 +458,60 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// DELETE ITEMS
+const deleteItem = (et) => {
+  const dropzones = document.querySelectorAll(".dropzones");
+  const resultContainer = document.querySelector("#results-container");
+
+  function deleteOperation(target, parent) {
+    const item = target.closest(".item");
+    const itemTitle = item.querySelector(".item-title").innerHTML;
+
+    localStorage.removeItem("Items Data");
+
+    [...elementInfoData].forEach((data) => {
+      if (data.title == itemTitle) {
+        const index = elementInfoData.indexOf(data);
+        elementInfoData.splice(index, index + 1);
+      }
+    });
+
+    parent.removeChild(item);
+
+    localStorage.setItem("Items Data", JSON.stringify(elementInfoData));
+
+    DropzonesElementStorage(
+      dropzones[0].children,
+      dropzones[1].children,
+      dropzones[2].children
+    );
+  }
+
+  document.addEventListener("click", (e) => {
+    if (
+      e.target.classList.contains("delete-icon") &&
+      e.target.closest(".dropzones")
+    ) {
+      const dropzone = e.target.closest(".dropzones");
+      deleteOperation(e.target, dropzone);
+    }
+
+    if (
+      e.target.classList.contains("delete-icon") &&
+      e.target.closest("#results-container")
+    ) {
+      const container = e.target.closest("#results-container");
+      deleteOperation(e.target, container);
+    }
+  });
+
+  // USE EqualToclone method to delete the items that similar to the item deleted from the results container.
+};
+
 changeDisplays();
 titleInputValidation();
 createItem();
 getItemTags();
 dragndrop();
 loadingElementInfoData();
+deleteItem();
